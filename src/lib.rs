@@ -5,13 +5,13 @@ pub mod sys_reader;
 pub use metrics::SystemMetrics;
 pub use collector::MetricsCollector;
 
-use std::time::{Duration, SystemTime, UNIX_EPOCH};
+use std::time::{Duration, UNIX_EPOCH};
 
 use pyo3::prelude::*;
-use pyo3::types::PyDict;
+use pyo3::types::{PyDict, PyModule};
 
-fn metrics_to_pydict<'py>(py: Python<'py>, m: &SystemMetrics) -> &'py PyDict {
-    let out = PyDict::new(py);
+fn metrics_to_pydict<'py>(py: Python<'py>, m: &SystemMetrics) -> pyo3::Bound<'py, PyDict> {
+    let out = PyDict::new_bound(py);
     let ts = m
         .timestamp
         .duration_since(UNIX_EPOCH)
@@ -47,7 +47,7 @@ fn metrics_to_pydict<'py>(py: Python<'py>, m: &SystemMetrics) -> &'py PyDict {
 }
 
 #[pyfunction]
-fn get_metrics_once(py: Python, interval_ms: u64) -> PyResult<Py<PyDict>> {
+fn get_metrics_once(py: Python, interval_ms: u64) -> PyResult<PyObject> {
     // Use a dedicated runtime to await one sample
     let rt = tokio::runtime::Runtime::new()
         .map_err(|e| PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(format!("{e}")))?;
@@ -59,7 +59,7 @@ fn get_metrics_once(py: Python, interval_ms: u64) -> PyResult<Py<PyDict>> {
     });
 
     match metrics {
-        Some(m) => Ok(metrics_to_pydict(py, &m).into()),
+        Some(m) => Ok(metrics_to_pydict(py, &m).into_py(py)),
         None => Err(PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(
             "failed to collect metrics",
         )),
@@ -67,8 +67,8 @@ fn get_metrics_once(py: Python, interval_ms: u64) -> PyResult<Py<PyDict>> {
 }
 
 #[pymodule]
-fn scrapster(_py: Python, m: &PyModule) -> PyResult<()> {
-    m.add_function(pyo3::wrap_pyfunction!(get_metrics_once, m)?)?;
+fn scrapster(_py: Python, m: &pyo3::Bound<PyModule>) -> PyResult<()> {
+    m.add_function(pyo3::wrap_pyfunction_bound!(get_metrics_once, m)?)?;
     Ok(())
 }
 
