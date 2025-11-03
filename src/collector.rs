@@ -21,7 +21,13 @@ impl MetricsCollector {
 
         tokio::spawn(async move {
             #[cfg(feature = "pi")]
-            let mut pi_sensors = PiSensors::new().ok();
+            let mut pi_sensors = match PiSensors::new() {
+                Ok(ps) => Some(ps),
+                Err(e) => {
+                    eprintln!("PiSensors init failed: {}", e);
+                    None
+                }
+            };
 
             let mut prev_cpu_tot: u64 = 0;
             let mut prev_cpu_idle: u64 = 0;
