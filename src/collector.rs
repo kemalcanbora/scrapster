@@ -3,8 +3,6 @@ use tokio::{sync::broadcast, time};
 
 use crate::metrics::SystemMetrics;
 use crate::sys_reader::*;
-#[cfg(feature = "pi")]
-use crate::pi::{read_dht22, PiSensors};
 
 pub struct MetricsCollector {
     interval: Duration,
@@ -20,15 +18,6 @@ impl MetricsCollector {
         let interval = self.interval;
 
         tokio::spawn(async move {
-            #[cfg(feature = "pi")]
-            let pi_sensors = match PiSensors::new() {
-                Ok(ps) => Some(ps),
-                Err(e) => {
-                    eprintln!("PiSensors init failed: {}", e);
-                    None
-                }
-            };
-
             let mut prev_cpu_tot: u64 = 0;
             let mut prev_cpu_idle: u64 = 0;
             let mut prev_ctxt: u64 = 0;
@@ -70,36 +59,8 @@ impl MetricsCollector {
                 let (rx_bps, tx_bps) = diff_netdev(&prev_net, &net, interval.as_secs_f64());
                 prev_net = net;
 
-                // Optional Pi sensor readings
-                #[cfg(feature = "pi")]
-                let (fan_rpm_opt, env_temp_opt, env_humidity_opt, pwm_duty_opt) = {
-                    // pulses measured since last tick
-                    let rpm = if let Some(ref ps) = pi_sensors {
-                        let pulses = ps.take_pulses() as f64;
-                        Some((pulses / 2.0) * (60.0 / interval.as_secs_f64()))
-                    } else {
-                        None
-                    };
-
-                    let (t, h) = read_dht22().map(|(t, h)| (Some(t), Some(h))).unwrap_or((None, None));
-
-                    let duty = if let Some(ref ps) = pi_sensors {
-                        ps.pwm_duty_percent().ok()
-                    } else {
-                        None
-                    };
-
-                    (rpm, t, h, duty)
-                };
-
-                #[cfg(not(feature = "pi"))]
-                let (fan_rpm_opt, env_temp_opt, env_humidity_opt, pwm_duty_opt) = (None, None, None, None);
-
                 let metrics = SystemMetrics {
-                    timestamp: std::time::SystemTime::now()
-                        .duration_since(std::time::UNIX_EPOCH)
-                        .unwrap()
-                        .as_secs(),
+                    timestamp: std::time::SystemTime::now(),
                     cpu_usage_percent: cpu_usage,
                     cpu_user_percent: 100f32 * (user as f32 / total as f32),
                     cpu_system_percent: 100f32 * (system as f32 / total as f32),
@@ -124,10 +85,6 @@ impl MetricsCollector {
                     disk_write_bytes_per_sec: dwrite,
                     net_rx_bytes_per_sec: rx_bps,
                     net_tx_bytes_per_sec: tx_bps,
-                    fan_rpm: fan_rpm_opt,
-                    env_temp_celsius: env_temp_opt,
-                    env_humidity_percent: env_humidity_opt,
-                    pwm_duty_percent: pwm_duty_opt,
                 };
 
                 let _ = tx.send(metrics);

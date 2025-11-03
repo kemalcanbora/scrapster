@@ -1,6 +1,6 @@
 #[derive(Debug, Clone)]
 pub struct SystemMetrics {
-    pub timestamp: u64,
+    pub timestamp: std::time::SystemTime,
     // CPU
     pub cpu_usage_percent: f32,
     pub cpu_user_percent: f32,
@@ -31,10 +31,5 @@ pub struct SystemMetrics {
     // Network
     pub net_rx_bytes_per_sec: u64,
     pub net_tx_bytes_per_sec: u64,
-    // Optional Pi sensors
-    pub fan_rpm: Option<f64>,
-    pub env_temp_celsius: Option<f32>,
-    pub env_humidity_percent: Option<f32>,
-    pub pwm_duty_percent: Option<f64>,
 }
 
