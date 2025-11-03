@@ -17,10 +17,11 @@ classifiers = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/your-org/scrapster"
+Homepage = "https://github.com/kemalcanbora/scrapster"
 
 [tool.maturin]
 module-name = "scrapster"
 features = []
 strip = true
+sdist = false
 
