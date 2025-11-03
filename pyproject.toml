@@ -1,0 +1,26 @@
+[build-system]
+requires = ["maturin>=1,<2"]
+build-backend = "maturin"
+
+[project]
+name = "scrapster"
+dynamic = ["version", "description"]
+requires-python = ">=3.8"
+readme = "README.md"
+license = { text = "MIT" }
+keywords = ["metrics", "system", "rust", "pyo3"]
+classifiers = [
+  "Programming Language :: Python",
+  "Programming Language :: Rust",
+  "Operating System :: POSIX :: Linux",
+  "Operating System :: MacOS",
+]
+
+[project.urls]
+Homepage = "https://github.com/your-org/scrapster"
+
+[tool.maturin]
+module-name = "scrapster"
+features = []
+strip = true
+
