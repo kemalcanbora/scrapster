@@ -65,11 +65,12 @@ jobs:
         run: |
           mkdir -p upload
           find dist -name "*.whl" -exec cp {} upload/ \;
-      - name: Publish wheels to PyPI
+      - name: Publish wheels to PyPI (maturin)
         if: startsWith(github.ref, 'refs/tags/v')
-        uses: pypa/gh-action-pypi-publish@v1.12.2
+        uses: PyO3/maturin-action@v1
+        env:
+          MATURIN_PYPI_TOKEN: ${{ secrets.PYPI_API_TOKEN }}
         with:
-          user: __token__
-          password: ${{ secrets.PYPI_API_TOKEN }}
-          packages-dir: upload
+          command: upload
+          args: --skip-existing upload/*.whl
 
