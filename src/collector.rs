@@ -21,7 +21,7 @@ impl MetricsCollector {
 
         tokio::spawn(async move {
             #[cfg(feature = "pi")]
-            let mut pi_sensors = match PiSensors::new() {
+            let pi_sensors = match PiSensors::new() {
                 Ok(ps) => Some(ps),
                 Err(e) => {
                     eprintln!("PiSensors init failed: {}", e);

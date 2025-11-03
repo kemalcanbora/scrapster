@@ -7,11 +7,9 @@ use rppal::gpio::{Gpio, InputPin, Trigger};
 use rppal::pwm::{Channel, Polarity, Pwm};
 
 // Default pin/frequency settings; adjust as needed
-const PWM_PIN: u8 = 12; // GPIO12 supports PWM0
 const TACH_PIN: u8 = 18; // Example tach pin
 const PWM_FREQ_HZ: f64 = 1000.0;
 const DUTY_PERCENT: f64 = 100.0;
-const DHT_PIN: u8 = 26; // DHT22 data pin
 
 pub struct PiSensors {
     pwm: Pwm,
