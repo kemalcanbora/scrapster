@@ -74,5 +74,7 @@ jobs:
         with:
           command: upload
           args: --skip-existing upload/*.whl
-          username: __token__
-          password: ${{ secrets.PYPI_API_TOKEN }}
+        env:
+          MATURIN_USERNAME: __token__
+          MATURIN_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
+
