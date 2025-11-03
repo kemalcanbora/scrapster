@@ -65,12 +65,9 @@ impl PiSensors {
 }
 
 pub fn read_dht22() -> Option<(f32, f32)> {
-    // Using the API style provided by the user sample: dht_sensor::dht22::read(DHT_PIN)
-    // If reading fails, return None
-    match dht_sensor::dht22::read(DHT_PIN) {
-        Ok(measurement) => Some((measurement.temperature, measurement.humidity)),
-        Err(_) => None,
-    }
+    // TODO: Implement using dht_sensor::dht22::Reading::read with an embedded-hal delay and pin adapter.
+    // Placeholder to avoid build error until adapter is added.
+    None
 }
 
 
