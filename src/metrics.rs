@@ -31,5 +31,7 @@ pub struct SystemMetrics {
     // Network
     pub net_rx_bytes_per_sec: u64,
     pub net_tx_bytes_per_sec: u64,
+    // Clocks
+    pub measure_clock: u64,
 }
 

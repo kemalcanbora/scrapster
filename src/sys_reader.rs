@@ -87,6 +87,26 @@ pub fn read_throttle_status() -> u32 {
     0
 }
 
+pub fn read_measure_clock() -> u64 {
+    if let Ok(output) = std::process::Command::new("vcgencmd")
+        .arg("measure_clock")
+        .arg("arm")
+        .output()
+    {
+        if output.status.success() {
+            let s = String::from_utf8_lossy(&output.stdout);
+            // Expected output example: "frequency(48)=1500000000\n"
+            if let Some(eq_idx) = s.find('=') {
+                let val_str = &s[eq_idx + 1..].trim();
+                if let Ok(hz) = val_str.parse::<u64>() {
+                    return hz;
+                }
+            }
+        }
+    }
+    0
+}
+
 pub fn read_meminfo() -> (u64, u64) {
     let mut total: u64 = 0;
     let mut free: u64 = 0;

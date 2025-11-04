@@ -44,6 +44,8 @@ impl MetricsCollector {
 
                 let throttle = read_throttle_status();
 
+                let clk = read_measure_clock();
+
                 let (mem_total, mem_used) = read_meminfo();
                 let (vm_minor, vm_major) = read_vmstat(prev_vm_minor, prev_vm_major);
                 prev_vm_minor = vm_minor;
@@ -85,6 +87,7 @@ impl MetricsCollector {
                     disk_write_bytes_per_sec: dwrite,
                     net_rx_bytes_per_sec: rx_bps,
                     net_tx_bytes_per_sec: tx_bps,
+                    measure_clock: clk,
                 };
 
                 let _ = tx.send(metrics);

@@ -43,6 +43,7 @@ fn metrics_to_pydict<'py>(py: Python<'py>, m: &SystemMetrics) -> pyo3::Bound<'py
     out.set_item("disk_write_bytes_per_sec", m.disk_write_bytes_per_sec).unwrap();
     out.set_item("net_rx_bytes_per_sec", m.net_rx_bytes_per_sec).unwrap();
     out.set_item("net_tx_bytes_per_sec", m.net_tx_bytes_per_sec).unwrap();
+    out.set_item("measure_clock", m.measure_clock).unwrap();
     out
 }
 
